@@ -10,8 +10,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see < https://www.gnu.org/licenses/>.
 #include <algorithm>
-#include <cstdio>
-#include <ctime>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -20,9 +18,7 @@
 #include <vector>
 #include <Windows.h>
 std::vector<int> num;
-bool check(int);
 void monkeySort(int);
-void upset(int);
 int main(void)
 {
 #ifdef _WIN32
@@ -44,11 +40,11 @@ int main(void)
         num.clear();
         std::cout << "请输入您要排序的数的个数：";
         std::cin >> len;
-        std::rewind(stdin);
+        std::cin.ignore();
         std::cout << "请输入您要排序的数（空格隔开，回车结束）：";
         std::getline(std::cin, str);
         ss << str;
-        num.resize(len + 10);
+        num.resize(static_cast<long long>(len) + 10LL);
         for (int i = 0; i < len; i++)
         {
             ss >> num.at(i);
@@ -59,10 +55,10 @@ int main(void)
         {
             std::cout << num.at(i) << ", ";
         }
-        std::cout << num.at(len - 1) << std::endl;
+        std::cout << num.at(static_cast<long long>(len) - 1LL) << std::endl;
         std::cout << "是否重新开始（是/Y重新开始，其他字符结束）？";
         std::cin >> confirm;
-        std::rewind(stdin);
+        std::cin.ignore();
         switch (confirm)
         {
         case '是': case 'Y': case 'y':
@@ -77,35 +73,13 @@ int main(void)
     std::cin.get();
     return 0;
 }
-bool check(int n)
-{
-    for (int i = 1; i < n; i++)
-    {
-        if (num.at(i) < num.at(i - 1))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-void monkeySort(int num)
-{
-    while (!check(num))
-    {
-        upset(num);
-    }
-    return;
-}
-void upset(int n)
+void monkeySort(int n)
 {
     struct timeb timeSeed;
-    std::default_random_engine re;
-    for (int i = 0; i < n ; i++)
+    while (!std::is_sorted(num.begin(), num.begin() + n))
     {
-        std::uniform_int_distribution<unsigned> uid(0, n - i - 1);
         ftime(&timeSeed);
-        re.seed(timeSeed.time * 1000 + timeSeed.millitm);
-        std::swap(num.at(i), num.at(i + uid(re)));
+        std::shuffle(num.begin(), num.begin() + n, std::default_random_engine(timeSeed.time * 1000 + timeSeed.millitm));
     }
     return;
 }
